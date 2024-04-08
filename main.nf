@@ -1770,7 +1770,7 @@ input:
  val mate from g_54_mate_g22_20
 
 output:
- set val(name), file("*_atleast-*.fastq")  into g22_20_reads0_g23_15, g22_20_reads0_g74_12
+ set val(name), file("*_atleast-*.fastq")  into g22_20_reads0_g_80, g22_20_reads0_g23_15, g22_20_reads0_g74_12
  set val(name), file("out*")  into g22_20_logFile1_g72_0
 
 script:
@@ -1796,6 +1796,26 @@ if(num!=0){
 
 """
 SplitSeq.py group -s ${readArray} -f ${field} ${num} >> out_${R1}_SS.log
+"""
+
+}
+
+
+process vdjbase_input {
+
+publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /${chain}$/) "reads/$filename"}
+input:
+ set val(name),file(reads) from g22_20_reads0_g_80
+
+output:
+ file "${chain}"  into g_80_germlineDb00
+
+script:
+chain = params.vdjbase_input.chain
+
+"""
+mkdir ${chain}
+mv ${reads} ${chain}/${name}.fasta
 """
 
 }
