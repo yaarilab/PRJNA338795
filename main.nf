@@ -28,7 +28,7 @@ input:
  val mate from g_11_mate_g1_0
 
 output:
- set val(name), file("*_${method}-pass.fast*")  into g1_0_reads00
+ set val(name), file("*_${method}-pass.fast*")  into g1_0_reads0_g9_11
  set val(name), file("FS_*")  into g1_0_logFile1_g1_5
  set val(name), file("*_${method}-fail.fast*") optional true  into g1_0_reads22
  set val(name),file("out*") optional true  into g1_0_logFile33
@@ -252,6 +252,7 @@ process Mask_Primer_1_MaskPrimers {
 
 input:
  val mate from g_11_mate_g9_11
+ set val(name),file(reads) from g1_0_reads0_g9_11
 
 output:
  set val(name), file("*_primers-pass.fastq")  into g9_11_reads0_g53_9
