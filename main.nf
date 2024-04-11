@@ -2168,7 +2168,7 @@ rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_di
 
 process metadata {
 
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*.json$/) "outputparam/$filename"}
+publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*.json$/) "metadata/$filename"}
 
 output:
  file "*.json"  into g_79_jsonFile00
