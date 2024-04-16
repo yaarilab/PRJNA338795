@@ -1709,7 +1709,7 @@ input:
  val mate from g_11_mate_g20_15
 
 output:
- set val(name),file("*${out}")  into g20_15_reads0_g21_16, g20_15_reads0_g74_12
+ set val(name),file("*${out}")  into g20_15_reads0_g21_16
  set val(name),file("out*")  into g20_15_logFile1_g72_0
 
 script:
@@ -1763,7 +1763,7 @@ input:
  val mate from g_54_mate_g21_16
 
 output:
- set val(name),  file("*_collapse-unique.fast*")  into g21_16_reads0_g22_20, g21_16_reads0_g74_12
+ set val(name),  file("*_collapse-unique.fast*")  into g21_16_reads0_g22_20
  set val(name),  file("*_collapse-duplicate.fast*") optional true  into g21_16_reads_duplicate11
  set val(name),  file("*_collapse-undetermined.fast*") optional true  into g21_16_reads_undetermined22
  file "CS_*"  into g21_16_logFile33
@@ -1810,7 +1810,7 @@ input:
  val mate from g_54_mate_g22_20
 
 output:
- set val(name), file("*_atleast-*.fastq")  into g22_20_reads0_g_80, g22_20_reads0_g23_15, g22_20_reads0_g74_12
+ set val(name), file("*_atleast-*.fastq")  into g22_20_reads0_g_80, g22_20_reads0_g23_15
  set val(name), file("out*")  into g22_20_logFile1_g72_0
 
 script:
@@ -1858,176 +1858,6 @@ mkdir ${chain}
 mv ${reads} ${chain}/${name}.fasta
 """
 
-}
-
-
-process create_report_Consensus_Headers_PH_Consensus_Headers {
-
-input:
- set val(name),  file(headers_total) from g20_15_reads0_g74_12
- set val(name),  file(headers_unique) from g21_16_reads0_g74_12
- set val(name),  file(headers_atleast2) from g22_20_reads0_g74_12
-
-output:
- set val(name),  file("*_reheader_headers.tab")  into g74_12_logFile0_g74_6
- set val(name),  file("*_collapse-unique_headers.tab")  into g74_12_logFile1_g74_6
- set val(name),  file("*_atleast*.tab")  into g74_12_logFile2_g74_6
-
-shell:
-
-
-readArray = headers_total.toString().split(' ')	
-headers_total = readArray[0]
-readArray = headers_unique.toString().split(' ')	
-headers_unique = readArray[0]
-readArray = headers_atleast2.toString().split(' ')	
-headers_atleast2 = readArray[0]
-
-"""
-ParseHeaders.py table -s ${headers_total} ${headers_unique} ${headers_atleast2} -f ID PRCONS CREGION CONSCOUNT DUPCOUNT
-"""	
-}
-
-
-process create_report_Consensus_Headers_report_Consensus_Headers {
-
-input:
- set val(name),  file(headers_total) from g74_12_logFile0_g74_6
- set val(name),  file(headers_unique) from g74_12_logFile1_g74_6
- set val(name),  file(headers_atleast2) from g74_12_logFile2_g74_6
-
-output:
- file "*.rmd"  into g74_6_rMarkdown0_g74_7
-
-
-shell:
-
-
-readArray = headers_total.toString().split(' ')	
-headers_total = readArray[0]
-readArray = headers_unique.toString().split(' ')	
-headers_unique = readArray[0]
-readArray = headers_atleast2.toString().split(' ')	
-headers_atleast2 = readArray[0]
-
-'''
-#!/usr/bin/env perl
-
-
-my $script = <<'EOF';
-	
-```{R, message=FALSE, echo=FALSE, results="hide"}
-# Setup
-library(prestor)
-library(knitr)
-library(captioner)
-if (!exists("tables")) { tables <- captioner(prefix="Table") }
-if (!exists("figures")) { figures <- captioner(prefix="Figure") }
-figures("headers_conscount", "Histogram showing the distribution of read counts (CONSCOUNT) for 
-                              total sequences (top) and unique sequences (bottom).")
-figures("headers_dupcount", "Histogram showing the distribution of unique UMI counts for 
-                             all unique sequences (top) and unique sequences represented 
-                             by at least two raw reads (bottom).")
-figures("headers_pr1", "Percentage internal C-region annotations for total sequences.
-                        Parenthetical numbers in the legend are the number of sequences.")
-figures("headers_pr2", "Percentage internal C-region annotations for all unique sequences.
-                        Parenthetical numbers in the legend are the number of sequences.")
-figures("headers_pr3", "Percentage internal C-region annotations for unique sequences represented by at least two raw reads.
-                        Parenthetical numbers in the legend are the number of sequences.")
-```
-
-```{r, echo=FALSE}
-parse_log_1 <- loadLogTable(file.path( ".", "!{headers_total}"))
-parse_log_2 <- loadLogTable(file.path( ".", "!{headers_unique}"))
-parse_log_3 <- loadLogTable(file.path( ".", "!{headers_atleast2}"))
-
-primer_field <- if ("CREGION" %in% names(parse_log_1) && !all(is.na(parse_log_1$CREGION))) {
-    "CREGION"
-} else if ("C_CALL" %in% names(parse_log_1) && !all(is.na(parse_log_1$C_CALL))) { 
-  "C_CALL"
-} else{
-  "PRCONS"
-}
-
-```
-
-# Summary of Final Output
-
-Final processed output is contained in the `total`, `unique`, and `unique-atleast-2` 
-files, which contain all processed sequences, unique sequences, and only those unique
-sequences represented by at least two raw reads, respectively. The figures below
-shown the distributions of annotations for these final output files.
-
-## Distribution of read and UMI counts
-
-```{r, echo=FALSE}
-plotParseHeaders(parse_log_1, parse_log_2, 
-                 titles=c("Total", "Unique"), 
-                 style="count", primer=primer_field, count="CONSCOUNT", 
-                 sizing="figure")
-```
-
-`r figures("headers_conscount")`
-
-```{r, echo=FALSE}
-plotParseHeaders(parse_log_2, parse_log_3, 
-                 titles=c("Unique", "At least 2 Reads"), 
-                 style="count", primer=primer_field, count="DUPCOUNT", 
-                 sizing="figure")
-```
-
-`r figures("headers_dupcount")`
-
-## C-region annotations
-
-```{r, echo=FALSE}
-plotParseHeaders(parse_log_1, titles=c("Total"), 
-                 style="primer", primer=primer_field, sizing="figure")
-```
-
-`r figures("headers_pr1")`
-
-```{r, echo=FALSE}
-plotParseHeaders(parse_log_2, titles=c("Unique"), 
-                 style="primer", primer=primer_field, sizing="figure") 
-```
-
-`r figures("headers_pr2")`
-
-```{r, echo=FALSE}
-plotParseHeaders(parse_log_3,  titles=c("Unique At least 2 Reads"), 
-                 style="primer", primer=primer_field, sizing="figure") 
-```
-
-`r figures("headers_pr3")`
-
-EOF
-	
-open OUT, ">!{name}.rmd";
-print OUT $script;
-close OUT;
-
-'''
-}
-
-
-process create_report_Consensus_Headers_render_rmarkdown {
-
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*.html$/) "Consensus_Headers_report/$filename"}
-input:
- file rmk from g74_6_rMarkdown0_g74_7
-
-output:
- file "*.html"  into g74_7_outputFileHTML00
- file "*csv" optional true  into g74_7_csvFile11
-
-"""
-
-#!/usr/bin/env Rscript 
-
-rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_dir=".")
-
-"""
 }
 
 
