@@ -288,7 +288,7 @@ rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_di
 }
 
 
-process Mask_Primer_MaskPrimers {
+process Mask_Primer_1_MaskPrimers {
 
 input:
  val mate from g_11_mate_g9_11
@@ -301,22 +301,22 @@ output:
  set val(name),file("out*")  into g9_11_logFile3_g72_0
 
 script:
-method = params.Mask_Primer_MaskPrimers.method
-barcode_field = params.Mask_Primer_MaskPrimers.barcode_field
-primer_field = params.Mask_Primer_MaskPrimers.primer_field
-barcode = params.Mask_Primer_MaskPrimers.barcode
-revpr = params.Mask_Primer_MaskPrimers.revpr
-mode = params.Mask_Primer_MaskPrimers.mode
-failed = params.Mask_Primer_MaskPrimers.failed
-nproc = params.Mask_Primer_MaskPrimers.nproc
-maxerror = params.Mask_Primer_MaskPrimers.maxerror
-umi_length = params.Mask_Primer_MaskPrimers.umi_length
-start = params.Mask_Primer_MaskPrimers.start
-extract_length = params.Mask_Primer_MaskPrimers.extract_length
-maxlen = params.Mask_Primer_MaskPrimers.maxlen
-skiprc = params.Mask_Primer_MaskPrimers.skiprc
-R1_primers = params.Mask_Primer_MaskPrimers.R1_primers
-R2_primers = params.Mask_Primer_MaskPrimers.R2_primers
+method = params.Mask_Primer_1_MaskPrimers.method
+barcode_field = params.Mask_Primer_1_MaskPrimers.barcode_field
+primer_field = params.Mask_Primer_1_MaskPrimers.primer_field
+barcode = params.Mask_Primer_1_MaskPrimers.barcode
+revpr = params.Mask_Primer_1_MaskPrimers.revpr
+mode = params.Mask_Primer_1_MaskPrimers.mode
+failed = params.Mask_Primer_1_MaskPrimers.failed
+nproc = params.Mask_Primer_1_MaskPrimers.nproc
+maxerror = params.Mask_Primer_1_MaskPrimers.maxerror
+umi_length = params.Mask_Primer_1_MaskPrimers.umi_length
+start = params.Mask_Primer_1_MaskPrimers.start
+extract_length = params.Mask_Primer_1_MaskPrimers.extract_length
+maxlen = params.Mask_Primer_1_MaskPrimers.maxlen
+skiprc = params.Mask_Primer_1_MaskPrimers.skiprc
+R1_primers = params.Mask_Primer_1_MaskPrimers.R1_primers
+R2_primers = params.Mask_Primer_1_MaskPrimers.R2_primers
 //* @style @condition:{method="score",umi_length,start,maxerror}{method="extract",umi_length,start},{method="align",maxerror,maxlen,skiprc}, {method="extract",start,extract_length} @array:{method,barcode_field,primer_field,barcode,revpr,mode,maxerror,umi_length,start,extract_length,maxlen,skiprc} @multicolumn:{method,barcode_field,primer_field,barcode,revpr,mode,failed,nproc,maxerror,umi_length,start,extract_length,maxlen,skiprc}
 
 method = (method.collect().size==2) ? method : [method[0],method[0]]
@@ -444,7 +444,7 @@ if(mate=="pair"){
 }
 
 
-process Mask_Primer_parse_log_MP {
+process Mask_Primer_1_parse_log_MP {
 
 publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*table.tab$/) "MP1_log_table/$filename"}
 input:
@@ -464,7 +464,7 @@ ParseLog.py -l ${readArray}  -f ID PRIMER BARCODE ERROR
 }
 
 
-process Mask_Primer_try_report_maskprimer {
+process Mask_Primer_1_try_report_maskprimer {
 
 input:
  file primers from g9_9_logFile0_g9_12
@@ -660,7 +660,7 @@ if(mate=="pair"){
 }
 
 
-process Mask_Primer_presto_render_rmarkdown {
+process Mask_Primer_1_presto_render_rmarkdown {
 
 publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*.html$/) "MP_report/$filename"}
 input:
@@ -1206,7 +1206,7 @@ if(mate=="pair"){
 }
 
 
-process Mask_Primer_MaskPrimers {
+process Mask_Primer_2_MaskPrimers {
 
 input:
  val mate from g_54_mate_g18_11
@@ -1219,22 +1219,22 @@ output:
  set val(name),file("out*")  into g18_11_logFile33
 
 script:
-method = params.Mask_Primer_MaskPrimers.method
-barcode_field = params.Mask_Primer_MaskPrimers.barcode_field
-primer_field = params.Mask_Primer_MaskPrimers.primer_field
-barcode = params.Mask_Primer_MaskPrimers.barcode
-revpr = params.Mask_Primer_MaskPrimers.revpr
-mode = params.Mask_Primer_MaskPrimers.mode
-failed = params.Mask_Primer_MaskPrimers.failed
-nproc = params.Mask_Primer_MaskPrimers.nproc
-maxerror = params.Mask_Primer_MaskPrimers.maxerror
-umi_length = params.Mask_Primer_MaskPrimers.umi_length
-start = params.Mask_Primer_MaskPrimers.start
-extract_length = params.Mask_Primer_MaskPrimers.extract_length
-maxlen = params.Mask_Primer_MaskPrimers.maxlen
-skiprc = params.Mask_Primer_MaskPrimers.skiprc
-R1_primers = params.Mask_Primer_MaskPrimers.R1_primers
-R2_primers = params.Mask_Primer_MaskPrimers.R2_primers
+method = params.Mask_Primer_2_MaskPrimers.method
+barcode_field = params.Mask_Primer_2_MaskPrimers.barcode_field
+primer_field = params.Mask_Primer_2_MaskPrimers.primer_field
+barcode = params.Mask_Primer_2_MaskPrimers.barcode
+revpr = params.Mask_Primer_2_MaskPrimers.revpr
+mode = params.Mask_Primer_2_MaskPrimers.mode
+failed = params.Mask_Primer_2_MaskPrimers.failed
+nproc = params.Mask_Primer_2_MaskPrimers.nproc
+maxerror = params.Mask_Primer_2_MaskPrimers.maxerror
+umi_length = params.Mask_Primer_2_MaskPrimers.umi_length
+start = params.Mask_Primer_2_MaskPrimers.start
+extract_length = params.Mask_Primer_2_MaskPrimers.extract_length
+maxlen = params.Mask_Primer_2_MaskPrimers.maxlen
+skiprc = params.Mask_Primer_2_MaskPrimers.skiprc
+R1_primers = params.Mask_Primer_2_MaskPrimers.R1_primers
+R2_primers = params.Mask_Primer_2_MaskPrimers.R2_primers
 //* @style @condition:{method="score",umi_length,start,maxerror}{method="extract",umi_length,start},{method="align",maxerror,maxlen,skiprc}, {method="extract",start,extract_length} @array:{method,barcode_field,primer_field,barcode,revpr,mode,maxerror,umi_length,start,extract_length,maxlen,skiprc} @multicolumn:{method,barcode_field,primer_field,barcode,revpr,mode,failed,nproc,maxerror,umi_length,start,extract_length,maxlen,skiprc}
 
 method = (method.collect().size==2) ? method : [method[0],method[0]]
@@ -1320,7 +1320,7 @@ if(mate=="pair"){
 }
 
 
-process Mask_Primer_parse_log_MP {
+process Mask_Primer_2_parse_log_MP {
 
 publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*table.tab$/) "MP2_log_table/$filename"}
 input:
@@ -1340,7 +1340,7 @@ ParseLog.py -l ${readArray}  -f ID PRIMER BARCODE ERROR
 }
 
 
-process Mask_Primer_try_report_maskprimer {
+process Mask_Primer_2_try_report_maskprimer {
 
 input:
  file primers from g18_9_logFile0_g18_12
@@ -1536,7 +1536,7 @@ if(mate=="pair"){
 }
 
 
-process Mask_Primer_presto_render_rmarkdown {
+process Mask_Primer_2_presto_render_rmarkdown {
 
 publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*.html$/) "MP_report/$filename"}
 input:
