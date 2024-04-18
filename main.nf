@@ -1550,7 +1550,7 @@ input:
  val mate from g_54_mate_g21_16
 
 output:
- set val(name),  file("*_collapse-unique.fast*")  into g21_16_reads0_g_83, g21_16_reads0_g_83
+ set val(name),  file("*_collapse-unique.fast*")  into g21_16_reads0_g_83
  set val(name),  file("*_collapse-duplicate.fast*") optional true  into g21_16_reads_duplicate11
  set val(name),  file("*_collapse-undetermined.fast*") optional true  into g21_16_reads_undetermined22
  file "CS_*"  into g21_16_logFile33
@@ -1592,7 +1592,6 @@ CollapseSeq.py -s ${reads} -n ${max_missing} ${fasta} ${inner} ${uf} ${cf} ${act
 process split_seq {
 
 input:
- set val(name),file(reads) from g21_16_reads0_g_83
  set val(name),file(reads) from g21_16_reads0_g_83
 
 output:
