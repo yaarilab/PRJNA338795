@@ -18,7 +18,7 @@ Channel
  }
 
 Channel.value(params.mate).into{g_11_mate_g_82;g_11_mate_g15_9;g_11_mate_g53_9;g_11_mate_g20_15;g_11_mate_g1_0;g_11_mate_g1_5;g_11_mate_g1_7;g_11_mate_g9_11;g_11_mate_g9_9;g_11_mate_g9_12;g_11_mate_g13_10;g_11_mate_g13_12;g_11_mate_g13_14;g_11_mate_g12_12;g_11_mate_g12_15;g_11_mate_g12_19}
-Channel.value(params.mate2).into{g_54_mate_g22_20;g_54_mate_g23_15;g_54_mate_g21_16;g_54_mate_g18_11;g_54_mate_g18_9;g_54_mate_g18_12}
+Channel.value(params.mate2).into{g_54_mate_g23_15;g_54_mate_g21_16;g_54_mate_g18_11;g_54_mate_g18_9;g_54_mate_g18_12}
 
 
 process unizp {
@@ -402,48 +402,6 @@ if(mate=="pair"){
 }
 
 
-process Pair_Sequence_pre_consensus_pair_seq {
-
-input:
- set val(name),file(reads) from g9_11_reads0_g53_9
- val mate from g_11_mate_g53_9
-
-output:
- set val(name),file("*_pair-pass.fastq")  into g53_9_reads0_g13_10
- set val(name),file("out*")  into g53_9_logFile1_g72_0
-
-script:
-coord = params.Pair_Sequence_pre_consensus_pair_seq.coord
-act = params.Pair_Sequence_pre_consensus_pair_seq.act
-copy_fields_1 = params.Pair_Sequence_pre_consensus_pair_seq.copy_fields_1
-copy_fields_2 = params.Pair_Sequence_pre_consensus_pair_seq.copy_fields_2
-failed = params.Pair_Sequence_pre_consensus_pair_seq.failed
-nproc = params.Pair_Sequence_pre_consensus_pair_seq.nproc
-
-if(mate=="pair"){
-	
-	act = (act=="none") ? "" : "--act ${act}"
-	failed = (failed=="true") ? "--failed" : "" 
-	copy_fields_1 = (copy_fields_1=="") ? "" : "--1f ${copy_fields_1}" 
-	copy_fields_2 = (copy_fields_2=="") ? "" : "--2f ${copy_fields_2}"
-	
-	readArray = reads.toString().split(' ')	
-	R1 = readArray[0]
-	R2 = readArray[1]
-	"""
-	PairSeq.py -1 ${R1} -2 ${R2} ${copy_fields_1} ${copy_fields_2} --coord ${coord} ${act} ${failed} >> out_${R1}_PS.log
-	"""
-}else{
-	
-	"""
-	echo -e 'PairSeq works only on pair-end reads.'
-	"""
-}
-
-
-}
-
-
 process Mask_Primer_1_parse_log_MP {
 
 publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*table.tab$/) "MP1_log_table/$filename"}
@@ -680,6 +638,48 @@ rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_di
 """
 }
 
+
+process Pair_Sequence_pre_consensus_pair_seq {
+
+input:
+ set val(name),file(reads) from g9_11_reads0_g53_9
+ val mate from g_11_mate_g53_9
+
+output:
+ set val(name),file("*_pair-pass.fastq")  into g53_9_reads0_g13_10
+ set val(name),file("out*")  into g53_9_logFile1_g72_0
+
+script:
+coord = params.Pair_Sequence_pre_consensus_pair_seq.coord
+act = params.Pair_Sequence_pre_consensus_pair_seq.act
+copy_fields_1 = params.Pair_Sequence_pre_consensus_pair_seq.copy_fields_1
+copy_fields_2 = params.Pair_Sequence_pre_consensus_pair_seq.copy_fields_2
+failed = params.Pair_Sequence_pre_consensus_pair_seq.failed
+nproc = params.Pair_Sequence_pre_consensus_pair_seq.nproc
+
+if(mate=="pair"){
+	
+	act = (act=="none") ? "" : "--act ${act}"
+	failed = (failed=="true") ? "--failed" : "" 
+	copy_fields_1 = (copy_fields_1=="") ? "" : "--1f ${copy_fields_1}" 
+	copy_fields_2 = (copy_fields_2=="") ? "" : "--2f ${copy_fields_2}"
+	
+	readArray = reads.toString().split(' ')	
+	R1 = readArray[0]
+	R2 = readArray[1]
+	"""
+	PairSeq.py -1 ${R1} -2 ${R2} ${copy_fields_1} ${copy_fields_2} --coord ${coord} ${act} ${failed} >> out_${R1}_PS.log
+	"""
+}else{
+	
+	"""
+	echo -e 'PairSeq works only on pair-end reads.'
+	"""
+}
+
+
+}
+
 boolean isCollectionOrArray_bc(object) {    
     [Collection, Object[]].any { it.isAssignableFrom(object.getClass()) }
 }
@@ -784,48 +784,6 @@ if(mate=="pair"){
 }else{
 	"""
 	BuildConsensus.py -s $reads ${args_1} --outname ${name} --log BC_${name}.log ${failed} --nproc ${nproc} 2>&1 | tee -a out_${R1}_BC.log
-	"""
-}
-
-
-}
-
-
-process Pair_Sequence_post_consensus_pair_seq {
-
-input:
- set val(name),file(reads) from g13_10_reads0_g15_9
- val mate from g_11_mate_g15_9
-
-output:
- set val(name),file("*_pair-pass.fastq")  into g15_9_reads0_g12_12
- set val(name),file("out*")  into g15_9_logFile1_g72_0
-
-script:
-coord = params.Pair_Sequence_post_consensus_pair_seq.coord
-act = params.Pair_Sequence_post_consensus_pair_seq.act
-copy_fields_1 = params.Pair_Sequence_post_consensus_pair_seq.copy_fields_1
-copy_fields_2 = params.Pair_Sequence_post_consensus_pair_seq.copy_fields_2
-failed = params.Pair_Sequence_post_consensus_pair_seq.failed
-nproc = params.Pair_Sequence_post_consensus_pair_seq.nproc
-
-if(mate=="pair"){
-	
-	act = (act=="none") ? "" : "--act ${act}"
-	failed = (failed=="true") ? "--failed" : "" 
-	copy_fields_1 = (copy_fields_1=="") ? "" : "--1f ${copy_fields_1}" 
-	copy_fields_2 = (copy_fields_2=="") ? "" : "--2f ${copy_fields_2}"
-	
-	readArray = reads.toString().split(' ')	
-	R1 = readArray[0]
-	R2 = readArray[1]
-	"""
-	PairSeq.py -1 ${R1} -2 ${R2} ${copy_fields_1} ${copy_fields_2} --coord ${coord} ${act} ${failed} >> out_${R1}_PS.log
-	"""
-}else{
-	
-	"""
-	echo -e 'PairSeq works only on pair-end reads.'
 	"""
 }
 
@@ -1084,6 +1042,48 @@ rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_di
 }
 
 
+process Pair_Sequence_post_consensus_pair_seq {
+
+input:
+ set val(name),file(reads) from g13_10_reads0_g15_9
+ val mate from g_11_mate_g15_9
+
+output:
+ set val(name),file("*_pair-pass.fastq")  into g15_9_reads0_g12_12
+ set val(name),file("out*")  into g15_9_logFile1_g72_0
+
+script:
+coord = params.Pair_Sequence_post_consensus_pair_seq.coord
+act = params.Pair_Sequence_post_consensus_pair_seq.act
+copy_fields_1 = params.Pair_Sequence_post_consensus_pair_seq.copy_fields_1
+copy_fields_2 = params.Pair_Sequence_post_consensus_pair_seq.copy_fields_2
+failed = params.Pair_Sequence_post_consensus_pair_seq.failed
+nproc = params.Pair_Sequence_post_consensus_pair_seq.nproc
+
+if(mate=="pair"){
+	
+	act = (act=="none") ? "" : "--act ${act}"
+	failed = (failed=="true") ? "--failed" : "" 
+	copy_fields_1 = (copy_fields_1=="") ? "" : "--1f ${copy_fields_1}" 
+	copy_fields_2 = (copy_fields_2=="") ? "" : "--2f ${copy_fields_2}"
+	
+	readArray = reads.toString().split(' ')	
+	R1 = readArray[0]
+	R2 = readArray[1]
+	"""
+	PairSeq.py -1 ${R1} -2 ${R2} ${copy_fields_1} ${copy_fields_2} --coord ${coord} ${act} ${failed} >> out_${R1}_PS.log
+	"""
+}else{
+	
+	"""
+	echo -e 'PairSeq works only on pair-end reads.'
+	"""
+}
+
+
+}
+
+
 process Assemble_pairs_assemble_pairs {
 
 input:
@@ -1206,6 +1206,175 @@ if(mate=="pair"){
 }
 
 
+process Assemble_pairs_parse_log_AP {
+
+publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*table.tab$/) "AP_log_table/$filename"}
+input:
+ set val(name),file(log_file) from g12_12_logFile1_g12_15
+ val mate from g_11_mate_g12_15
+
+output:
+ file "*table.tab"  into g12_15_logFile0_g12_25, g12_15_logFile0_g12_19
+
+script:
+field_to_parse = params.Assemble_pairs_parse_log_AP.field_to_parse
+readArray = log_file.toString()	
+
+"""
+ParseLog.py -l ${readArray}  -f ${field_to_parse}
+"""
+
+
+}
+
+
+process Assemble_pairs_report_assemble_pairs {
+
+input:
+ file log_files from g12_15_logFile0_g12_19
+ val matee from g_11_mate_g12_19
+
+output:
+ file "*.rmd"  into g12_19_rMarkdown0_g12_25
+
+
+
+shell:
+
+if(matee=="pair"){
+	readArray = log_files.toString().split(' ')
+	assemble = readArray[0]
+	name = assemble-"_table.tab"
+	'''
+	#!/usr/bin/env perl
+	
+	
+	my $script = <<'EOF';
+	
+	```{r, message=FALSE, echo=FALSE, results="hide"}
+	# Setup
+	library(prestor)
+	library(knitr)
+	library(captioner)
+	
+	if (!exists("tables")) { tables <- captioner(prefix="Table") }
+	if (!exists("figures")) { figures <- captioner(prefix="Figure") }
+	figures("assemble_length", "Histogram showing the distribution assembled sequence lengths in 
+	                            nucleotides for the Align step (top) and Reference step (bottom).")
+	figures("assemble_overlap", "Histogram showing the distribution of overlapping nucleotides between 
+	                             mate-pairs for the Align step (top) and Reference step (bottom).
+	                             Negative values for overlap indicate non-overlapping mate-pairs
+	                             with the negative value being the number of gap characters between
+	                             the ends of the two mate-pairs.")
+	figures("assemble_error", "Histograms showing the distribution of paired-end assembly error 
+	                           rates for the Align step (top) and identity to the reference germline 
+	                           for the Reference step (bottom).")
+	figures("assemble_pvalue", "Histograms showing the distribution of significance scores for 
+	                            paired-end assemblies. P-values for the Align mode are shown in the top
+	                            panel. E-values from the Reference step's alignment against the 
+	                            germline sequences are shown in the bottom panel for both input files
+	                            separately.")
+	```
+	
+	```{r, echo=FALSE, warning=FALSE}
+	assemble_log <- loadLogTable(file.path(".", "!{assemble}"))
+	
+	# Subset to align and reference logs
+	align_fields <- c("ERROR", "PVALUE")
+	ref_fields <- c("REFID", "GAP", "EVALUE1", "EVALUE2", "IDENTITY")
+	align_log <- assemble_log[!is.na(assemble_log$ERROR), !(names(assemble_log) %in% ref_fields)]
+	ref_log <- assemble_log[!is.na(assemble_log$REFID), !(names(assemble_log) %in% align_fields)]
+	
+	# Build log set
+	assemble_list <- list()
+	if (nrow(align_log) > 0) { assemble_list[["Align"]] <- align_log }
+	if (nrow(ref_log) > 0) { assemble_list[["Reference"]] <- ref_log }
+	plot_titles <- names(assemble_list)
+	```
+	
+	# Paired-End Assembly
+	
+	Assembly of paired-end reads is performed using the AssemblePairs tool which 
+	determines the read overlap in two steps. First, de novo assembly is attempted 
+	using an exhaustive approach to identify all possible overlaps between the 
+	two reads with alignment error rates and p-values below user-defined thresholds. 
+	This method is denoted as the `Align` method in the following figures. 
+	Second, those reads failing the first stage of de novo assembly are then 
+	mapped to the V-region reference sequences to create a full length sequence, 
+	padding with Ns, for any amplicons that have insufficient overlap for 
+	de novo assembly. This second stage is referred to as the `Reference` step in the
+	figures below.
+	
+	## Assembled sequence lengths
+	
+	```{r, echo=FALSE, warning=FALSE}
+	plot_params <- list(titles=plot_titles, style="length", sizing="figure")
+	do.call(plotAssemblePairs, c(assemble_list, plot_params))
+	```
+	
+	`r figures("assemble_length")`
+	
+	```{r, echo=FALSE, warning=FALSE}
+	plot_params <- list(titles=plot_titles, style="overlap", sizing="figure")
+	do.call(plotAssemblePairs, c(assemble_list, plot_params))
+	```
+	
+	`r figures("assemble_overlap")`
+	
+	## Alignment error rates and significance
+	
+	```{r, echo=FALSE, warning=FALSE}
+	plot_params <- list(titles=plot_titles, style="error", sizing="figure")
+	do.call(plotAssemblePairs, c(assemble_list, plot_params))
+	```
+	
+	`r figures("assemble_error")`
+	
+	```{r, echo=FALSE, warning=FALSE}
+	plot_params <- list(titles=plot_titles, style="pvalue", sizing="figure")
+	do.call(plotAssemblePairs, c(assemble_list, plot_params))
+	```
+
+	`r figures("assemble_pvalue")`
+
+	EOF
+	
+	open OUT, ">AP_!{name}.rmd";
+	print OUT $script;
+	close OUT;
+	
+	'''
+
+}else{
+	
+	"""
+	echo -e 'AssemblePairs works only on pair-end reads.'
+	"""
+}
+}
+
+
+process Assemble_pairs_presto_render_rmarkdown {
+
+publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*.html$/) "AP_report/$filename"}
+input:
+ file rmk from g12_19_rMarkdown0_g12_25
+ file log_file from g12_15_logFile0_g12_25
+
+output:
+ file "*.html"  into g12_25_outputFileHTML00
+ file "*csv" optional true  into g12_25_csvFile11
+
+"""
+
+#!/usr/bin/env Rscript 
+
+rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_dir=".")
+
+"""
+}
+
+
 process Mask_Primer_2_MaskPrimers {
 
 input:
@@ -1316,6 +1485,157 @@ if(mate=="pair"){
 	MaskPrimers.py ${args_1} -s ${reads} ${R1_primers} --log MP_${name}.log  --nproc ${nproc} ${failed} 2>&1 | tee -a out_${R1}_MP.log
 	"""
 }
+
+}
+
+
+process Parse_header_parse_headers {
+
+input:
+ set val(name), file(reads) from g18_11_reads0_g20_15
+ val mate from g_11_mate_g20_15
+
+output:
+ set val(name),file("*${out}")  into g20_15_reads0_g21_16
+ set val(name),file("out*")  into g20_15_logFile1_g72_0
+
+script:
+method = params.Parse_header_parse_headers.method
+act = params.Parse_header_parse_headers.act
+args = params.Parse_header_parse_headers.args
+
+"""
+echo ${name}
+"""
+
+readArray = reads.toString().split(' ')	
+if(mate=="pair"){
+	R1 = readArray.grep(~/.*R1.*/)[0]
+	R2 = readArray.grep(~/.*R2.*/)[0]
+}else{
+	R1 = readArray[0]
+}
+
+
+if(method=="collapse" || method=="add" || method=="copy" || method=="rename" || method=="merge"){
+	out="_reheader.fastq"
+	"""
+	ParseHeaders.py  ${method} -s ${reads} ${args} --act ${act} >> out_${R1}_PH.log
+	"""
+}else{
+	if(method=="table"){
+			out=".tab"
+			"""
+			ParseHeaders.py ${method} -s ${reads} ${args} >> out_${R1}_PH.log
+			"""	
+	}else{
+		out="_reheader.fastq"
+		"""
+		ParseHeaders.py ${method} -s ${reads} ${args} >> out_${R1}_PH.log
+		"""		
+	}
+}
+
+
+}
+
+
+process collapse_sequences_collapse_seq {
+
+publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*_collapse-unique.fast.*$/) "reads_unique/$filename"}
+publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*_collapse-duplicate.fast.*$/) "reads_duplicated/$filename"}
+publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*_collapse-undetermined.fast.*$/) "reads_undetermined/$filename"}
+input:
+ set val(name), file(reads) from g20_15_reads0_g21_16
+ val mate from g_54_mate_g21_16
+
+output:
+ set val(name),  file("*_collapse-unique.fast*")  into g21_16_reads0_g_83
+ set val(name),  file("*_collapse-duplicate.fast*") optional true  into g21_16_reads_duplicate11
+ set val(name),  file("*_collapse-undetermined.fast*") optional true  into g21_16_reads_undetermined22
+ file "CS_*"  into g21_16_logFile33
+ set val(name),  file("out*")  into g21_16_logFile4_g72_0
+
+script:
+max_missing = params.collapse_sequences_collapse_seq.max_missing
+inner = params.collapse_sequences_collapse_seq.inner
+fasta = params.collapse_sequences_collapse_seq.fasta
+act = params.collapse_sequences_collapse_seq.act
+uf = params.collapse_sequences_collapse_seq.uf
+cf = params.collapse_sequences_collapse_seq.cf
+nproc = params.collapse_sequences_collapse_seq.nproc
+failed = params.collapse_sequences_collapse_seq.failed
+
+inner = (inner=="true") ? "--inner" : ""
+fasta = (fasta=="true") ? "--fasta" : ""
+act = (act=="none") ? "" : "--act ${act}"
+cf = (cf=="") ? "" : "--cf ${cf}"
+uf = (uf=="") ? "" : "--uf ${uf}"
+failed = (failed=="false") ? "" : "--failed"
+
+readArray = reads.toString().split(' ')	
+if(mate=="pair"){
+	R1 = readArray.grep(~/.*R1.*/)[0]
+	R2 = readArray.grep(~/.*R2.*/)[0]
+}else{
+	R1 = readArray[0]
+}
+
+
+"""
+CollapseSeq.py -s ${reads} -n ${max_missing} ${fasta} ${inner} ${uf} ${cf} ${act} --log CS_${name}.log ${failed} >> out_${R1}_collapse.log
+"""
+
+}
+
+
+process split_seq {
+
+input:
+ set val(name),file(reads) from g21_16_reads0_g_83
+
+output:
+ set val(name), file("*_atleast-*.fast*")  into g_83_fastaFile0_g_80
+ file val(name), file("*.log") optional true  into g_83_logFile1_g72_0
+
+script:
+field = params.split_seq.field
+num = params.split_seq.num
+fasta = params.split_seq.fasta
+
+readArray = reads.toString()
+
+if(num!=0){
+	num = " --num ${num}"
+}else{
+	num = ""
+}
+
+fasta = (fasta=="false") ? "" : "--fasta"
+
+"""
+SplitSeq.py group -s ${readArray} -f ${field} ${num} ${fasta} >> out_${readArray}_SS.log
+"""
+
+}
+
+
+process vdjbase_input {
+
+publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /${chain}$/) "reads/$filename"}
+input:
+ set val(name),file(reads) from g_83_fastaFile0_g_80
+
+output:
+ file "${chain}"  into g_80_germlineDb00
+
+script:
+chain = params.vdjbase_input.chain
+
+"""
+mkdir ${chain}
+mv ${reads} ${chain}
+"""
 
 }
 
@@ -1557,339 +1877,10 @@ rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_di
 }
 
 
-process Assemble_pairs_parse_log_AP {
-
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*table.tab$/) "AP_log_table/$filename"}
-input:
- set val(name),file(log_file) from g12_12_logFile1_g12_15
- val mate from g_11_mate_g12_15
-
-output:
- file "*table.tab"  into g12_15_logFile0_g12_25, g12_15_logFile0_g12_19
-
-script:
-field_to_parse = params.Assemble_pairs_parse_log_AP.field_to_parse
-readArray = log_file.toString()	
-
-"""
-ParseLog.py -l ${readArray}  -f ${field_to_parse}
-"""
-
-
-}
-
-
-process Assemble_pairs_report_assemble_pairs {
-
-input:
- file log_files from g12_15_logFile0_g12_19
- val matee from g_11_mate_g12_19
-
-output:
- file "*.rmd"  into g12_19_rMarkdown0_g12_25
-
-
-
-shell:
-
-if(matee=="pair"){
-	readArray = log_files.toString().split(' ')
-	assemble = readArray[0]
-	name = assemble-"_table.tab"
-	'''
-	#!/usr/bin/env perl
-	
-	
-	my $script = <<'EOF';
-	
-	```{r, message=FALSE, echo=FALSE, results="hide"}
-	# Setup
-	library(prestor)
-	library(knitr)
-	library(captioner)
-	
-	if (!exists("tables")) { tables <- captioner(prefix="Table") }
-	if (!exists("figures")) { figures <- captioner(prefix="Figure") }
-	figures("assemble_length", "Histogram showing the distribution assembled sequence lengths in 
-	                            nucleotides for the Align step (top) and Reference step (bottom).")
-	figures("assemble_overlap", "Histogram showing the distribution of overlapping nucleotides between 
-	                             mate-pairs for the Align step (top) and Reference step (bottom).
-	                             Negative values for overlap indicate non-overlapping mate-pairs
-	                             with the negative value being the number of gap characters between
-	                             the ends of the two mate-pairs.")
-	figures("assemble_error", "Histograms showing the distribution of paired-end assembly error 
-	                           rates for the Align step (top) and identity to the reference germline 
-	                           for the Reference step (bottom).")
-	figures("assemble_pvalue", "Histograms showing the distribution of significance scores for 
-	                            paired-end assemblies. P-values for the Align mode are shown in the top
-	                            panel. E-values from the Reference step's alignment against the 
-	                            germline sequences are shown in the bottom panel for both input files
-	                            separately.")
-	```
-	
-	```{r, echo=FALSE, warning=FALSE}
-	assemble_log <- loadLogTable(file.path(".", "!{assemble}"))
-	
-	# Subset to align and reference logs
-	align_fields <- c("ERROR", "PVALUE")
-	ref_fields <- c("REFID", "GAP", "EVALUE1", "EVALUE2", "IDENTITY")
-	align_log <- assemble_log[!is.na(assemble_log$ERROR), !(names(assemble_log) %in% ref_fields)]
-	ref_log <- assemble_log[!is.na(assemble_log$REFID), !(names(assemble_log) %in% align_fields)]
-	
-	# Build log set
-	assemble_list <- list()
-	if (nrow(align_log) > 0) { assemble_list[["Align"]] <- align_log }
-	if (nrow(ref_log) > 0) { assemble_list[["Reference"]] <- ref_log }
-	plot_titles <- names(assemble_list)
-	```
-	
-	# Paired-End Assembly
-	
-	Assembly of paired-end reads is performed using the AssemblePairs tool which 
-	determines the read overlap in two steps. First, de novo assembly is attempted 
-	using an exhaustive approach to identify all possible overlaps between the 
-	two reads with alignment error rates and p-values below user-defined thresholds. 
-	This method is denoted as the `Align` method in the following figures. 
-	Second, those reads failing the first stage of de novo assembly are then 
-	mapped to the V-region reference sequences to create a full length sequence, 
-	padding with Ns, for any amplicons that have insufficient overlap for 
-	de novo assembly. This second stage is referred to as the `Reference` step in the
-	figures below.
-	
-	## Assembled sequence lengths
-	
-	```{r, echo=FALSE, warning=FALSE}
-	plot_params <- list(titles=plot_titles, style="length", sizing="figure")
-	do.call(plotAssemblePairs, c(assemble_list, plot_params))
-	```
-	
-	`r figures("assemble_length")`
-	
-	```{r, echo=FALSE, warning=FALSE}
-	plot_params <- list(titles=plot_titles, style="overlap", sizing="figure")
-	do.call(plotAssemblePairs, c(assemble_list, plot_params))
-	```
-	
-	`r figures("assemble_overlap")`
-	
-	## Alignment error rates and significance
-	
-	```{r, echo=FALSE, warning=FALSE}
-	plot_params <- list(titles=plot_titles, style="error", sizing="figure")
-	do.call(plotAssemblePairs, c(assemble_list, plot_params))
-	```
-	
-	`r figures("assemble_error")`
-	
-	```{r, echo=FALSE, warning=FALSE}
-	plot_params <- list(titles=plot_titles, style="pvalue", sizing="figure")
-	do.call(plotAssemblePairs, c(assemble_list, plot_params))
-	```
-
-	`r figures("assemble_pvalue")`
-
-	EOF
-	
-	open OUT, ">AP_!{name}.rmd";
-	print OUT $script;
-	close OUT;
-	
-	'''
-
-}else{
-	
-	"""
-	echo -e 'AssemblePairs works only on pair-end reads.'
-	"""
-}
-}
-
-
-process Assemble_pairs_presto_render_rmarkdown {
-
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*.html$/) "AP_report/$filename"}
-input:
- file rmk from g12_19_rMarkdown0_g12_25
- file log_file from g12_15_logFile0_g12_25
-
-output:
- file "*.html"  into g12_25_outputFileHTML00
- file "*csv" optional true  into g12_25_csvFile11
-
-"""
-
-#!/usr/bin/env Rscript 
-
-rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_dir=".")
-
-"""
-}
-
-
-process Parse_header_parse_headers {
-
-input:
- set val(name), file(reads) from g18_11_reads0_g20_15
- val mate from g_11_mate_g20_15
-
-output:
- set val(name),file("*${out}")  into g20_15_reads0_g21_16
- set val(name),file("out*")  into g20_15_logFile1_g72_0
-
-script:
-method = params.Parse_header_parse_headers.method
-act = params.Parse_header_parse_headers.act
-args = params.Parse_header_parse_headers.args
-
-"""
-echo ${name}
-"""
-
-readArray = reads.toString().split(' ')	
-if(mate=="pair"){
-	R1 = readArray.grep(~/.*R1.*/)[0]
-	R2 = readArray.grep(~/.*R2.*/)[0]
-}else{
-	R1 = readArray[0]
-}
-
-
-if(method=="collapse" || method=="add" || method=="copy" || method=="rename" || method=="merge"){
-	out="_reheader.fastq"
-	"""
-	ParseHeaders.py  ${method} -s ${reads} ${args} --act ${act} >> out_${R1}_PH.log
-	"""
-}else{
-	if(method=="table"){
-			out=".tab"
-			"""
-			ParseHeaders.py ${method} -s ${reads} ${args} >> out_${R1}_PH.log
-			"""	
-	}else{
-		out="_reheader.fastq"
-		"""
-		ParseHeaders.py ${method} -s ${reads} ${args} >> out_${R1}_PH.log
-		"""		
-	}
-}
-
-
-}
-
-
-process collapse_sequences_collapse_seq {
-
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*_collapse-unique.fast.*$/) "reads_unique/$filename"}
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*_collapse-duplicate.fast.*$/) "reads_duplicated/$filename"}
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*_collapse-undetermined.fast.*$/) "reads_undetermined/$filename"}
-input:
- set val(name), file(reads) from g20_15_reads0_g21_16
- val mate from g_54_mate_g21_16
-
-output:
- set val(name),  file("*_collapse-unique.fast*")  into g21_16_reads0_g22_20
- set val(name),  file("*_collapse-duplicate.fast*") optional true  into g21_16_reads_duplicate11
- set val(name),  file("*_collapse-undetermined.fast*") optional true  into g21_16_reads_undetermined22
- file "CS_*"  into g21_16_logFile33
- set val(name),  file("out*")  into g21_16_logFile4_g72_0
-
-script:
-max_missing = params.collapse_sequences_collapse_seq.max_missing
-inner = params.collapse_sequences_collapse_seq.inner
-fasta = params.collapse_sequences_collapse_seq.fasta
-act = params.collapse_sequences_collapse_seq.act
-uf = params.collapse_sequences_collapse_seq.uf
-cf = params.collapse_sequences_collapse_seq.cf
-nproc = params.collapse_sequences_collapse_seq.nproc
-failed = params.collapse_sequences_collapse_seq.failed
-
-inner = (inner=="true") ? "--inner" : ""
-fasta = (fasta=="true") ? "--fasta" : ""
-act = (act=="none") ? "" : "--act ${act}"
-cf = (cf=="") ? "" : "--cf ${cf}"
-uf = (uf=="") ? "" : "--uf ${uf}"
-failed = (failed=="false") ? "" : "--failed"
-
-readArray = reads.toString().split(' ')	
-if(mate=="pair"){
-	R1 = readArray.grep(~/.*R1.*/)[0]
-	R2 = readArray.grep(~/.*R2.*/)[0]
-}else{
-	R1 = readArray[0]
-}
-
-
-"""
-CollapseSeq.py -s ${reads} -n ${max_missing} ${fasta} ${inner} ${uf} ${cf} ${act} --log CS_${name}.log ${failed} >> out_${R1}_collapse.log
-"""
-
-}
-
-
-process split_sequences_split_seq {
-
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /out.*$/) "split_sequence_reads/$filename"}
-input:
- set val(name),file(reads) from g21_16_reads0_g22_20
- val mate from g_54_mate_g22_20
-
-output:
- set val(name), file("*_atleast-*.fastq")  into g22_20_reads0_g_80, g22_20_reads0_g23_15
- set val(name), file("out*")  into g22_20_logFile1_g72_0
-
-script:
-field = params.split_sequences_split_seq.field
-num = params.split_sequences_split_seq.num
-
-readArray = reads.toString().split(' ')	
-
-if(mate=="pair"){
-	R1 = readArray.grep(~/.*R1.*/)[0]
-	R2 = readArray.grep(~/.*R2.*/)[0]
-}else{
-	R1 = readArray[0]
-}
-
-readArray = reads.toString()
-
-if(num!=0){
-	num = " --num ${num}"
-}else{
-	num = ""
-}
-
-"""
-SplitSeq.py group -s ${readArray} -f ${field} ${num} >> out_${R1}_SS.log
-"""
-
-}
-
-
-process vdjbase_input {
-
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /${chain}$/) "reads/$filename"}
-input:
- set val(name),file(reads) from g22_20_reads0_g_80
-
-output:
- file "${chain}"  into g_80_germlineDb00
-
-script:
-chain = params.vdjbase_input.chain
-
-"""
-mkdir ${chain}
-mv ${reads} ${chain}/${name}.fasta
-"""
-
-}
-
-
 process Parse_header_table_parse_headers {
 
 publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*${out}$/) "parse_header_table/$filename"}
 input:
- set val(name), file(reads) from g22_20_reads0_g23_15
  val mate from g_54_mate_g23_15
 
 output:
@@ -1940,11 +1931,11 @@ if(method=="collapse" || method=="add" || method=="copy" || method=="rename" || 
 process make_report_pipeline_cat_all_file {
 
 input:
+ set val(name), file(log_file) from g_83_logFile1_g72_0
  set val(name), file(log_file) from g53_9_logFile1_g72_0
  set val(name), file(log_file) from g15_9_logFile1_g72_0
  set val(name), file(log_file) from g20_15_logFile1_g72_0
  set val(name), file(log_file) from g21_16_logFile4_g72_0
- set val(name), file(log_file) from g22_20_logFile1_g72_0
  set val(name), file(log_file) from g23_15_logFile1_g72_0
  set val(name), file(log_file) from g9_11_logFile3_g72_0
 
