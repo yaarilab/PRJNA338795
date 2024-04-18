@@ -1595,7 +1595,7 @@ input:
  set val(name),file(reads) from g21_16_reads0_g_83
 
 output:
- set val(name), file("*_atleast-*.fast*")  into g_83_fastaFile0_g_80, g_83_fastaFile0_g_80
+ set val(name), file("*_atleast-*.fast*")  into g_83_fastaFile0_g_80
  set val(name),file("out*") optional true  into g_83_logFile1_g72_0
 
 script:
@@ -1624,7 +1624,6 @@ process vdjbase_input {
 
 publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /${chain}$/) "reads/$filename"}
 input:
- set val(name),file(reads) from g_83_fastaFile0_g_80
  set val(name),file(reads) from g_83_fastaFile0_g_80
 
 output:
