@@ -1550,7 +1550,7 @@ input:
  val mate from g_54_mate_g21_16
 
 output:
- set val(name),  file("*_collapse-unique.fast*")  into g21_16_reads0_g_83
+ set val(name),  file("*_collapse-unique.fast*")  into g21_16_reads0_g_83, g21_16_reads0_g_83
  set val(name),  file("*_collapse-duplicate.fast*") optional true  into g21_16_reads_duplicate11
  set val(name),  file("*_collapse-undetermined.fast*") optional true  into g21_16_reads_undetermined22
  file "CS_*"  into g21_16_logFile33
@@ -1593,10 +1593,11 @@ process split_seq {
 
 input:
  set val(name),file(reads) from g21_16_reads0_g_83
+ set val(name),file(reads) from g21_16_reads0_g_83
 
 output:
- set val(name), file("*_atleast-*.fast*")  into g_83_fastaFile0_g_80
- file val(name), file("*.log") optional true  into g_83_logFile1_g72_0
+ set val(name), file("*_atleast-*.fast*")  into g_83_fastaFile0_g_80, g_83_fastaFile0_g_80
+ set val(name),file("out*") optional true  into g_83_logFile1_g72_0
 
 script:
 field = params.split_seq.field
@@ -1624,6 +1625,7 @@ process vdjbase_input {
 
 publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /${chain}$/) "reads/$filename"}
 input:
+ set val(name),file(reads) from g_83_fastaFile0_g_80
  set val(name),file(reads) from g_83_fastaFile0_g_80
 
 output:
