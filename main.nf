@@ -18,7 +18,7 @@ Channel
  }
 
 Channel.value(params.mate).into{g_11_mate_g_82;g_11_mate_g15_9;g_11_mate_g53_9;g_11_mate_g20_15;g_11_mate_g1_0;g_11_mate_g1_5;g_11_mate_g1_7;g_11_mate_g9_11;g_11_mate_g9_9;g_11_mate_g9_12;g_11_mate_g13_10;g_11_mate_g13_12;g_11_mate_g13_14;g_11_mate_g12_12;g_11_mate_g12_15;g_11_mate_g12_19}
-Channel.value(params.mate2).into{g_54_mate_g23_15;g_54_mate_g21_16;g_54_mate_g18_11;g_54_mate_g18_9;g_54_mate_g18_12}
+Channel.value(params.mate2).into{g_54_mate_g21_16;g_54_mate_g18_11;g_54_mate_g18_9;g_54_mate_g18_12}
 
 
 process unizp {
@@ -1879,57 +1879,6 @@ rmarkdown::render("${rmk}", clean=TRUE, output_format="html_document", output_di
 }
 
 
-process Parse_header_table_parse_headers {
-
-publishDir params.outdir, mode: 'copy', saveAs: {filename -> if (filename =~ /.*${out}$/) "parse_header_table/$filename"}
-input:
- val mate from g_54_mate_g23_15
-
-output:
- set val(name),file("*${out}")  into g23_15_reads00
- set val(name),file("out*")  into g23_15_logFile1_g72_0
-
-script:
-method = params.Parse_header_table_parse_headers.method
-act = params.Parse_header_table_parse_headers.act
-args = params.Parse_header_table_parse_headers.args
-
-"""
-echo ${name}
-"""
-
-readArray = reads.toString().split(' ')	
-if(mate=="pair"){
-	R1 = readArray.grep(~/.*R1.*/)[0]
-	R2 = readArray.grep(~/.*R2.*/)[0]
-}else{
-	R1 = readArray[0]
-}
-
-
-if(method=="collapse" || method=="add" || method=="copy" || method=="rename" || method=="merge"){
-	out="_reheader.fastq"
-	"""
-	ParseHeaders.py  ${method} -s ${reads} ${args} --act ${act} >> out_${R1}_PH.log
-	"""
-}else{
-	if(method=="table"){
-			out=".tab"
-			"""
-			ParseHeaders.py ${method} -s ${reads} ${args} >> out_${R1}_PH.log
-			"""	
-	}else{
-		out="_reheader.fastq"
-		"""
-		ParseHeaders.py ${method} -s ${reads} ${args} >> out_${R1}_PH.log
-		"""		
-	}
-}
-
-
-}
-
-
 process make_report_pipeline_cat_all_file {
 
 input:
@@ -1938,7 +1887,6 @@ input:
  set val(name), file(log_file) from g15_9_logFile1_g72_0
  set val(name), file(log_file) from g20_15_logFile1_g72_0
  set val(name), file(log_file) from g21_16_logFile4_g72_0
- set val(name), file(log_file) from g23_15_logFile1_g72_0
  set val(name), file(log_file) from g9_11_logFile3_g72_0
 
 output:
